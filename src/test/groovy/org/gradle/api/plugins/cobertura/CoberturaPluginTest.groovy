@@ -30,5 +30,12 @@ class CoberturaPluginTest extends Specification {
         project.tasks.test.extensions.getByName("cobertura") instanceof CoberturaTestTaskExtension
     }
 
+    def "when java plugin is applied the main source set is configured for coverage"() {
+        when:
+        project.apply(plugin: JavaPlugin)
+
+        then:
+        project.sourceSets.main.extensions.getByName("cobertura") instanceof CoberturaSourceSetExtension
+    }
 
 }
