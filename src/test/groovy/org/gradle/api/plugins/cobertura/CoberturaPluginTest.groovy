@@ -4,11 +4,16 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 import org.gradle.api.plugins.JavaPlugin
+import org.junit.Rule
+import org.gradle.api.plugins.cobertura.util.TemporaryFolder
 
 class CoberturaPluginTest extends Specification {
-    Project project = ProjectBuilder.builder().build()
+
+    @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
+    Project project
 
     def setup() {
+        project = ProjectBuilder.builder().withProjectDir(temporaryFolder.dir).build()
         project.apply(plugin: CoberturaPlugin)
     }
 
@@ -24,4 +29,6 @@ class CoberturaPluginTest extends Specification {
         then:
         project.tasks.test.extensions.getByName("cobertura") instanceof CoberturaTestTaskExtension
     }
+
+
 }
