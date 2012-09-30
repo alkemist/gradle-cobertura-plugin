@@ -17,6 +17,10 @@ class CoberturaPluginTest extends Specification {
         project.apply(plugin: CoberturaPlugin)
     }
 
+    def applyJavaPlugin() {
+        project.apply(plugin: JavaPlugin)
+    }
+
     def "extensions are installed"() {
         expect:
         project.extensions.getByName("cobertura") instanceof CoberturaPluginExtension
@@ -24,7 +28,7 @@ class CoberturaPluginTest extends Specification {
 
     def "when java plugin is applied test task is extended"() {
         when:
-        project.apply(plugin: JavaPlugin)
+        applyJavaPlugin()
 
         then:
         project.tasks.test.extensions.getByName("cobertura") instanceof CoberturaTestTaskExtension
@@ -32,10 +36,24 @@ class CoberturaPluginTest extends Specification {
 
     def "when java plugin is applied the main source set is configured for coverage"() {
         when:
-        project.apply(plugin: JavaPlugin)
+        applyJavaPlugin()
 
         then:
         project.sourceSets.main.extensions.getByName("cobertura") instanceof CoberturaSourceSetExtension
     }
 
+    def "classpath is wired"() {
+        given:
+        applyJavaPlugin()
+        def file = temporaryFolder.newFile("cobertura.jar")
+
+        when:
+        project.cobertura {
+            classpath = project.files("cobertura.jar")
+        }
+
+        then:
+        project.sourceSets.main.cobertura.coberturaClasspath.singleFile == file
+        project.tasks.testCoberturaReport.coberturaClasspath.singleFile == file
+    }
 }
